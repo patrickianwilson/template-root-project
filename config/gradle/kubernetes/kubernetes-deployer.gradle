@@ -7,11 +7,6 @@ project.ext {
  */
 
 task prepDeploy << {
-	def imageId = ""
-
-	if (project.hasProperty("imageId")) {
-		imageId = project.ext.imageId;
-	}
 
 	def serviceYamlFileTemplate = project.ext.serviceYamlFileTemplate
 
@@ -25,18 +20,7 @@ task prepDeploy << {
 	serviceFile.text = templateTxt;
 }
 
-
-
-task tagImageForPush (type: Exec, dependsOn: "assembleDockerImage") {
-	workingDir "$projectDir"
-	commandLine 'docker', 'tag', "${-> project.ext.imageId}", project.ext.dockerImagePath
-
-	inputs.file project.dockerFile
-	inputs.dir project.dockerWorkingDir
-
-}
-
-task pushImage (type: Exec, dependsOn: "tagImageForPush") {
+task pushImage (type: Exec, dependsOn: "assembleDockerImage") {
 	workingDir "$projectDir"
 	commandLine 'gcloud','docker', '--' ,'push', project.ext.dockerImagePath
 
